@@ -1,0 +1,87 @@
+name: Notification of deployment
+
+on:
+  workflow_call:
+    secrets:
+      MAIL_USERNAME:
+        required: true
+      MAIL_PASSWORD:
+        required: true
+      MAIL_FROM:
+        required: true
+      MAIL_TO:
+        required: true
+      MAIL_CC:
+        required: false
+      MAIL_BCC:
+        required: false
+    inputs:
+      individual:
+        required: false
+        type: boolean
+        default: false
+      domain:
+        required: true
+        type: string
+      finished:
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  notification:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set salutation
+        if: ${{ inputs.individual == true }}
+        run: echo "SALUTATION=Hallo %name%," >> $GITHUB_ENV
+      - name: Set salutation
+        if: ${{ inputs.individual == false }}
+        run: echo "SALUTATION=Hallo zusammen," >> $GITHUB_ENV
+
+      - name: Set subject
+        if: ${{ inputs.finished == false }}
+        run: echo "SUBJECT=Deployment auf ${{ inputs.domain }} wurde gestartet" >> $GITHUB_ENV
+      - name: Set state
+        if: ${{ inputs.finished == false }}
+        run: echo "STATE=soeben wurde ein Deployment gestartet." >> $GITHUB_ENV
+      - name: Set message
+        if: ${{ inputs.finished == false && inputs.individual == true }}
+        run: echo "MESSAGE=Falls du dich im Neos Backend befindest, wirst du in ein paar Minuten ausgeloggt." >> $GITHUB_ENV
+      - name: Set message
+        if: ${{ inputs.finished == false && inputs.individual == false }}
+        run: echo "MESSAGE=Falls ihr euch im Neos Backend befindet, werdet ihr in ein paar Minuten ausgeloggt." >> $GITHUB_ENV
+
+      - name: Set subject
+        if: ${{ inputs.finished == true }}
+        run: echo "SUBJECT=Deployment auf ${{ inputs.domain }} wurde abgeschlossen" >> $GITHUB_ENV
+      - name: Set state
+        if: ${{ inputs.finished == true }}
+        run: echo "STATE=das Deployment wurde erfolgreich abgeschlossen." >> $GITHUB_ENV
+      - name: Set message
+        if: ${{ inputs.finished == true && inputs.individual == true }}
+        run: echo "MESSAGE=Du kannst also wieder loslegen." >> $GITHUB_ENV
+      - name: Set message
+        if: ${{ inputs.finished == true && inputs.individual == false }}
+        run: echo "MESSAGE=Ihr könnt also wieder loslegen." >> $GITHUB_ENV
+
+      - name: Send email
+        uses: jonnitto/service-nodemailer@main
+        with:
+          service: iCloud
+          user: ${{ secrets.MAIL_USERNAME }}
+          pass: ${{ secrets.MAIL_PASSWORD }}
+          from: ${{ secrets.MAIL_FROM }}
+          to: ${{ secrets.MAIL_TO }}
+          cc: ${{ secrets.MAIL_CC }}
+          bcc: ${{ secrets.MAIL_BCC }}
+          individual: ${{ inputs.individual }}
+          subject: ${{ env.SUBJECT }}
+          text: |
+            ${{ env.SALUTATION }}
+
+            ${{ env.STATE }}
+            ${{ env.MESSAGE }}
+
+            Freundliche Grüße,
+            Jon Uhlmann
