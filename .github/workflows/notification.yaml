@@ -3,17 +3,17 @@ name: Notification of deployment
 on:
   workflow_call:
     secrets:
-      MAIL_USERNAME:
+      USERNAME:
         required: true
-      MAIL_PASSWORD:
+      PASSWORD:
         required: true
-      MAIL_FROM:
+      FROM:
         required: true
-      MAIL_TO:
+      TO:
         required: true
-      MAIL_CC:
+      CC:
         required: false
-      MAIL_BCC:
+      BCC:
         required: false
     inputs:
       individual:
@@ -69,12 +69,12 @@ jobs:
         uses: jonnitto/service-nodemailer@main
         with:
           service: iCloud
-          user: ${{ secrets.MAIL_USERNAME }}
-          pass: ${{ secrets.MAIL_PASSWORD }}
-          from: ${{ secrets.MAIL_FROM }}
-          to: ${{ secrets.MAIL_TO }}
-          cc: ${{ secrets.MAIL_CC }}
-          bcc: ${{ secrets.MAIL_BCC }}
+          user: ${{ secrets.USERNAME }}
+          pass: ${{ secrets.PASSWORD }}
+          from: ${{ secrets.FROM }}
+          to: ${{ secrets.TO }}
+          cc: ${{ secrets.CC }}
+          bcc: ${{ secrets.BCC }}
           individual: ${{ inputs.individual }}
           subject: ${{ env.SUBJECT }}
           text: |
