@@ -1,0 +1,79 @@
+name: Build website
+
+on:
+  workflow_call:
+    secrets:
+      COMPOSER_AUTH:
+        required: false
+    inputs:
+      node_version:
+        required: true
+        type: string
+      php_version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    env:
+      COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2.5.0
+        with:
+          node-version: ${{ inputs.node_version }}
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php_version }}
+          tools: composer:v2
+          extensions: mbstring, intl
+
+      - name: Configure composer authentication
+        if: ${{ env.COMPOSER_AUTH }}
+        run: composer config --auth ${{ env.COMPOSER_AUTH }}
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Restore composer cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Install packages with composer
+        run: composer install --no-interaction --no-ansi --optimize-autoloader --no-progress --prefer-dist
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: Restore yarn cache
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Build JS and CSS
+        run: yarn pipeline
+
+      - name: Compress files
+        run: tar -cvf build.tar Build DistributionPackages Packages/Libraries deploy.yaml deploy.php
+
+      - name: Upload file
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build.tar

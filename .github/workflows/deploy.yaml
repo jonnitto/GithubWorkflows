@@ -1,0 +1,61 @@
+name: Deploy website with deployer
+
+on:
+  workflow_call:
+    secrets:
+      COMPOSER_AUTH:
+        required: false
+      SSH_PRIVATE_KEY:
+        required: true
+      SSH_KNOWN_HOSTS:
+        required: true
+    inputs:
+      stage:
+        required: false
+        default: ''
+        type: string
+      php_version:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    env:
+      COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+      - name: Unpack artifact
+        run: tar -xvf build.tar
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: build
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php_version }}
+          tools: composer:v2
+          extensions: mbstring, intl
+      - name: Install deployer
+        run: |
+          curl -LO https://deployer.org/deployer.phar
+          chmod +x deployer.phar
+      - name: Create SSH know host file
+        run: |
+          mkdir $HOME/.ssh
+          touch $HOME/.ssh/known_hosts
+      - name: Set known host
+        run: echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> $HOME/.ssh/known_hosts
+      - name: Set private key
+        run: |
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" >> $HOME/.ssh/id_rsa
+          chmod 600 $HOME/.ssh/id_rsa
+      - name: Set composer authentication
+        if: ${{ env.COMPOSER_AUTH }}
+        run: echo "COMPOSER_AUTH_COMMAND=--composer_auth "${{ env.COMPOSER_AUTH }}" >> $GITHUB_ENV
+      - name: Deploy website
+        run: php deployer.phar deploy ${{ inputs.stage }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
