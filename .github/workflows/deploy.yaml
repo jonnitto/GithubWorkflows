@@ -56,6 +56,6 @@ jobs:
           chmod 600 $HOME/.ssh/id_rsa
       - name: Set composer authentication
         if: ${{ env.COMPOSER_AUTH }}
-        run: echo "COMPOSER_AUTH_COMMAND=--composer_auth "${{ env.COMPOSER_AUTH }}" >> $GITHUB_ENV
+        run: echo 'COMPOSER_AUTH_COMMAND=--composer_auth "${{ env.COMPOSER_AUTH }}"' >> $GITHUB_ENV
       - name: Deploy website
         run: php deployer.phar deploy ${{ inputs.stage }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
