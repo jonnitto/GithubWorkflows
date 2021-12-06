@@ -24,6 +24,8 @@ jobs:
       COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
     runs-on: ubuntu-latest
     steps:
+      - name: Get branch name
+        run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
@@ -58,4 +60,4 @@ jobs:
         if: ${{ env.COMPOSER_AUTH }}
         run: echo 'COMPOSER_AUTH_COMMAND=--composer_auth "${{ env.COMPOSER_AUTH }}"' >> $GITHUB_ENV
       - name: Deploy website
-        run: php deployer.phar deploy ${{ inputs.stage }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
+        run: php deployer.phar deploy ${{ inputs.stage }} --branch ${{ env.branch }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
