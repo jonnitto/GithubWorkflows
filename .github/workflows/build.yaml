@@ -7,7 +7,7 @@ on:
         required: false
     inputs:
       package_manager:
-        required: true
+        required: false
         description: Package manager to use
         default: yarn
         type: string
