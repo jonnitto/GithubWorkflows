@@ -9,7 +9,7 @@ on:
       package_manager:
         required: false
         description: Package manager to use
-        default: yarn
+        default: pnpm
         type: string
       php_version:
         required: true
@@ -58,7 +58,7 @@ jobs:
         run: composer install --no-interaction --no-ansi --optimize-autoloader --no-progress --prefer-dist
 
       - name: Build JS and CSS
-        run: yarn pipeline
+        run: ${{ inputs.package_manager }} run pipeline
 
       - name: Compress files
         run: tar -cvf build.tar Build DistributionPackages Packages/Libraries deploy.yaml deploy.php
