@@ -25,8 +25,8 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install pnpm
-        if: ${{ inputs.package_manager == "pnpm" }}
         uses: pnpm/action-setup@v2.0.1
+        if: ${{ inputs.package_manager == 'pnpm' }}
         with:
           version: 6.23.6
 
