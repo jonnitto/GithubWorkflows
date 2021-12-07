@@ -6,8 +6,10 @@ on:
       COMPOSER_AUTH:
         required: false
     inputs:
-      node_version:
+      package_manager:
         required: true
+        description: Package manager to use
+        default: yarn
         type: string
       php_version:
         required: true
@@ -25,7 +27,8 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2.5.0
         with:
-          node-version: ${{ inputs.node_version }}
+          node-version-file: .nvmrc
+          cache: ${{ inputs.package_manager }}
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -53,18 +56,6 @@ jobs:
 
       - name: Install packages with composer
         run: composer install --no-interaction --no-ansi --optimize-autoloader --no-progress --prefer-dist
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-
-      - name: Restore yarn cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
 
       - name: Build JS and CSS
         run: yarn pipeline
