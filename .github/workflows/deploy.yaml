@@ -17,6 +17,10 @@ on:
       php_version:
         required: true
         type: string
+      composer_version:
+        required: false
+        default: '6.8.0'
+        type: string
 
 jobs:
   deploy:
@@ -44,7 +48,7 @@ jobs:
           extensions: mbstring, intl
       - name: Install deployer
         run: |
-          curl -LO https://deployer.org/deployer.phar
+          curl -LO https://deployer.org/releases/v${{ inputs.composer_version }}/deployer.phar
           chmod +x deployer.phar
       - name: Create SSH know host file
         run: |
