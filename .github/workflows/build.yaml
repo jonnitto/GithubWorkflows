@@ -13,6 +13,12 @@ on:
         type: string
       php_version:
         required: true
+        description: PHP version to use
+        type: string
+      upload:
+        required: false
+        description: Define which files should be uploaded
+        default: Build DistributionPackages Packages/Libraries deploy.yaml deploy.php
         type: string
 
 jobs:
@@ -67,7 +73,7 @@ jobs:
         run: ${{ inputs.package_manager }} run pipeline
 
       - name: Compress files
-        run: tar -cvf build.tar Build DistributionPackages Packages/Libraries deploy.yaml deploy.php
+        run: tar -cvf build.tar ${{ inputs.upload }}
 
       - name: Upload file
         uses: actions/upload-artifact@v2

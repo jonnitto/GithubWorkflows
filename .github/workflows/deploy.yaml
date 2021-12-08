@@ -14,12 +14,15 @@ on:
         required: false
         default: ''
         type: string
+        description: Stage for composer
       php_version:
         required: true
         type: string
+        description: PHP version to use
       composer_version:
         required: false
         default: '6.8.0'
+        description: composer version to use
         type: string
 
 jobs:
