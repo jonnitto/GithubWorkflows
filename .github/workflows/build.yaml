@@ -11,6 +11,11 @@ on:
         description: Package manager to use
         default: pnpm
         type: string
+      remove_dev_dependencies:
+        required: false
+        description: Remove development dependencies for upload
+        default: false
+        type: boolean
       php_version:
         required: true
         description: PHP version to use
@@ -71,6 +76,10 @@ jobs:
 
       - name: Build JS and CSS
         run: ${{ inputs.package_manager }} run pipeline
+
+      - name: Remove dev dependencies
+        if: ${{ inputs.remove_dev_dependencies }}
+        run: composer install --no-interaction --no-ansi --optimize-autoloader --no-progress --prefer-dist --no-dev
 
       - name: Compress files
         run: tar -cvf build.tar ${{ inputs.upload }}
