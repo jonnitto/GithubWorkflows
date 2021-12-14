@@ -87,12 +87,12 @@ jobs:
         run: composer install --no-interaction --no-ansi --optimize-autoloader --no-progress --prefer-dist --no-dev
 
       - name: Compress files
-        if: ${{ inputs.push == false }}
+        if: ${{ inputs.upload }}
         run: tar -cvf build.tar ${{ inputs.upload }}
 
       - name: Upload file
         uses: actions/upload-artifact@v2
-        if: ${{ inputs.push == false }}
+        if: ${{ inputs.upload }}
         with:
           name: build
           path: build.tar
