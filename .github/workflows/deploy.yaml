@@ -95,5 +95,7 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" >> $HOME/.ssh/id_rsa
           chmod 600 $HOME/.ssh/id_rsa
 
+      - run: ls -al
+
       - name: Deploy website
-        run: php deployer.phar deploy ${{ inputs.stage }} --branch ${{ env.branch }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
+        run: deployer deploy ${{ inputs.stage }} --branch ${{ env.branch }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
