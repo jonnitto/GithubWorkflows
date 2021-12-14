@@ -60,6 +60,9 @@ jobs:
           php-version: ${{ inputs.php_version }}
           tools: composer:v2
           extensions: mbstring, intl
+      - name: Install packages with composer
+        if: ${{ inputs.useArtifact == false }}
+        run: composer install --no-interaction --no-ansi --optimize-autoloader --no-progress --prefer-dist
       - name: Install deployer
         run: |
           curl -LO https://deployer.org/releases/v${{ inputs.composer_version }}/deployer.phar
