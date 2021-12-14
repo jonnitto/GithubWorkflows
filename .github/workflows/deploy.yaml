@@ -58,7 +58,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ inputs.php_version }}
-          tools: composer:v2,deployer:${{{inputs.deployer_version}}}
+          tools: composer:v2,deployer:${{ inputs.deployer_version }}
           extensions: mbstring, intl
 
       - name: Configure composer authentication
