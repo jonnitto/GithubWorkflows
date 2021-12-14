@@ -24,10 +24,10 @@ on:
         required: true
         type: string
         description: PHP version to use
-      composer_version:
+      deployer_version:
         required: false
         default: '6.8.0'
-        description: composer version to use
+        description: deployer version to use
         type: string
 
 jobs:
@@ -58,15 +58,32 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ inputs.php_version }}
-          tools: composer:v2
+          tools: composer:v2,deployer:${{{inputs.deployer_version}}}
           extensions: mbstring, intl
+
+      - name: Configure composer authentication
+        if: ${{ env.COMPOSER_AUTH }}
+        run: |
+          composer config --auth ${{ env.COMPOSER_AUTH }}
+          echo 'COMPOSER_AUTH_COMMAND=--composer_auth "${{ env.COMPOSER_AUTH }}"' >> $GITHUB_ENV
+
+      - name: Get composer cache directory
+        if: ${{ inputs.useArtifact == false }}
+        id: composer-cache
+        run: |
+          echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Restore composer cache
+        if: ${{ inputs.useArtifact == false }}
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
       - name: Install packages with composer
         if: ${{ inputs.useArtifact == false }}
         run: composer install --no-interaction --no-ansi --optimize-autoloader --no-progress --prefer-dist
-      - name: Install deployer
-        run: |
-          curl -LO https://deployer.org/releases/v${{ inputs.composer_version }}/deployer.phar
-          chmod +x deployer.phar
+
       - name: Create SSH know host file
         run: |
           mkdir $HOME/.ssh
@@ -77,8 +94,6 @@ jobs:
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" >> $HOME/.ssh/id_rsa
           chmod 600 $HOME/.ssh/id_rsa
-      - name: Set composer authentication
-        if: ${{ env.COMPOSER_AUTH }}
-        run: echo 'COMPOSER_AUTH_COMMAND=--composer_auth "${{ env.COMPOSER_AUTH }}"' >> $GITHUB_ENV
+
       - name: Deploy website
-        run: php deployer.phar deploy ${{ inputs.stage }} --branch ${{ env.branch }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
+        run: dep deploy ${{ inputs.stage }} --branch ${{ env.branch }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
