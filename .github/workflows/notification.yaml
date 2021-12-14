@@ -18,6 +18,9 @@ on:
       REPLY_TO:
         required: false
     inputs:
+      message:
+        required: false
+        type: string
       individual:
         required: false
         type: boolean
@@ -84,7 +87,7 @@ jobs:
             ${{ env.SALUTATION }}
 
             ${{ env.STATE }}
-            ${{ env.MESSAGE }}
+            ${{ env.MESSAGE }} ${{inputs.message}}
 
             Freundliche Grüße,
             Jon Uhlmann
