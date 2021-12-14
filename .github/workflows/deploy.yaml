@@ -62,9 +62,8 @@ jobs:
           extensions: mbstring, intl
 
       - name: Configure composer authentication
-        if: ${{ env.COMPOSER_AUTH }}
+        if: ${{ env.COMPOSER_AUTH && inputs.useArtifact == false }}
         run: composer config --auth ${{ env.COMPOSER_AUTH }}
-
       - name: Get composer cache directory
         if: ${{ inputs.useArtifact == false }}
         id: composer-cache
