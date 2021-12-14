@@ -10,6 +10,11 @@ on:
       SSH_KNOWN_HOSTS:
         required: true
     inputs:
+      useArtifact:
+        required: false
+        default: true
+        type: boolean
+        description: Use artifact for deployment
       stage:
         required: false
         default: ''
@@ -33,13 +38,19 @@ jobs:
     steps:
       - name: Get branch name
         run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
+      - name: Checkout repository
+        if: ${{ inputs.useArtifact == false }}
+        uses: actions/checkout@v2
       - name: Download artifact
+        if: ${{ inputs.useArtifact == true }}
         uses: actions/download-artifact@v2
         with:
           name: build
       - name: Unpack artifact
+        if: ${{ inputs.useArtifact == true }}
         run: tar -xvf build.tar
       - name: Delete artifact
+        if: ${{ inputs.useArtifact == true }}
         uses: geekyeggo/delete-artifact@v1
         with:
           name: build
