@@ -58,7 +58,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ inputs.php_version }}
-          tools: composer:v2,deployer:${{ inputs.deployer_version }}
+          tools: composer:v2, deployer:${{ inputs.deployer_version }}
           extensions: mbstring, intl
 
       - name: Configure composer authentication
@@ -96,4 +96,4 @@ jobs:
           chmod 600 $HOME/.ssh/id_rsa
 
       - name: Deploy website
-        run: dep deploy ${{ inputs.stage }} --branch ${{ env.branch }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
+        run: php deployer.phar deploy ${{ inputs.stage }} --branch ${{ env.branch }} --no-interaction ${{ env.COMPOSER_AUTH_COMMAND }}
