@@ -18,6 +18,10 @@ on:
       REPLY_TO:
         required: false
     inputs:
+      sendMail:
+        required: false
+        type: boolean
+        default: true
       message:
         required: false
         type: string
@@ -71,6 +75,7 @@ jobs:
         run: echo "MESSAGE=Ihr könnt also wieder loslegen." >> $GITHUB_ENV
 
       - name: Send email
+        if: ${{ inputs.sendMail == true }}
         uses: jonnitto/service-nodemailer@main
         with:
           service: iCloud
