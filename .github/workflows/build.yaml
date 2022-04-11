@@ -91,7 +91,7 @@ jobs:
         run: tar -cvf build.tar ${{ inputs.upload }}
 
       - name: Upload file
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         if: ${{ inputs.upload }}
         with:
           name: build
