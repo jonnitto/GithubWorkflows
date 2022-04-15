@@ -1,0 +1,79 @@
+name: Deploy website with docker
+
+on:
+  workflow_call:
+    inputs:
+      artifact:
+        type: string
+        default: build
+        description: Name of the artifact to download & deploy
+      tags:
+        required: true
+        type: string
+        description: Tags for docker image
+      platforms:
+        type: string
+        default: linux/amd64,linux/arm64
+        description: Platforms for docker image
+      dockerfile:
+        type: string
+        default: ./.docker/Dockerfile
+        description: Dockerfile to use
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        id: buildx
+        with:
+          install: true
+
+      - name: Login to Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifact }}
+
+      - name: Unpack artifact
+        run: tar -xvf ${{ inputs.artifact }}.tar
+
+      - name: Delete artifact
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: ${{ inputs.artifact }}
+
+      - name: Remove not needed files
+        run: |
+          rm -rf .b* .e* .n* .p* .s* .y* *.js *.md *.json *.yml *.yaml deploy.* 2> /dev/null
+          rm -rf Makefile jsconfig.json package.json auth.json 2> /dev/null
+          rm -rf .github node_modules 2> /dev/null
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Build Image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ${{ inputs.dockerfile }}
+          push: true
+          tags: ${{ inputs.tags }}
+          platforms: ${{ inputs.platforms }}
