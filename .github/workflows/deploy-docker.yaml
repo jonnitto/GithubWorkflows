@@ -55,12 +55,6 @@ jobs:
         with:
           name: ${{ inputs.artifact }}
 
-      - name: Remove not needed files
-        run: |
-          rm -rf .b* .e* .n* .p* .s* .y* *.js *.md *.json *.yml *.yaml deploy.* 2> /dev/null
-          rm -rf Makefile jsconfig.json package.json auth.json 2> /dev/null
-          rm -rf .github node_modules 2> /dev/null
-
       - name: Cache Docker layers
         uses: actions/cache@v2
         with:
