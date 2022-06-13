@@ -47,7 +47,7 @@ jobs:
         id: repository_owner
         with:
           string: ${{ github.repository_owner }}
-      - name: Delete containers older than one week
+      - name: Delete containers
         if: ${{ inputs.accountIsOrganisation == false }}
         uses: snok/container-retention-policy@v1
         with:
@@ -58,7 +58,7 @@ jobs:
           keep-at-least: ${{ inputs.keepAtLeast }}
           skip-tags: latest
           token: ${{ secrets.READ_AND_DELETE_PACKAGES_TOKEN }}
-      - name: Delete containers older than one week
+      - name: Delete containers
         if: ${{ inputs.accountIsOrganisation == true }}
         uses: snok/container-retention-policy@v1
         with:
