@@ -1,0 +1,62 @@
+name: Delete old packages
+
+# on:
+#   schedule:
+#     # Run task once a week
+#     - cron: '0 0 * * 0'
+
+on:
+  workflow_call:
+    secrets:
+      READ_AND_DELETE_PACKAGES_TOKEN:
+        required: true
+    inputs:
+      imageName:
+        required: false
+        default: ''
+        type: string
+        description: Name of the image to delete, needs a slash at the beginning
+      accountIsOrganisation:
+        required: false
+        default: true
+        type: boolean
+        description: Account type is organisation, default to true
+
+jobs:
+  deleteOldPackages:
+    name: Delete old packages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Lowercase repository name
+        uses: ASzc/change-string-case-action@v2
+        id: repository_name
+        with:
+          string: ${{ github.event.repository.name }}
+      - name: Lowercase repository owner
+        uses: ASzc/change-string-case-action@v2
+        id: repository_owner
+        with:
+          string: ${{ github.repository_owner }}
+      - name: Delete containers older than one week
+        if: ${{ inputs.accountIsOrganisation == false }}
+        uses: snok/container-retention-policy@v1
+        with:
+          image-names: ${{ steps.repository_name.outputs.lowercase }}${{ inputs.imageName }}
+          cut-off: One week ago UTC
+          timestamp-to-use: updated_at
+          account-type: personal
+          keep-at-least: 5
+          skip-tags: latest
+          token: ${{ secrets.READ_AND_DELETE_PACKAGES_TOKEN }}
+      - name: Delete containers older than one week
+        if: ${{ inputs.accountIsOrganisation == true }}
+        uses: snok/container-retention-policy@v1
+        with:
+          image-names: ${{ steps.repository_name.outputs.lowercase }}${{ inputs.imageName }}
+          cut-off: One week ago UTC
+          timestamp-to-use: updated_at
+          account-type: org
+          org-name: ${{ steps.repository_owner.outputs.lowercase }}
+          keep-at-least: 5
+          skip-tags: latest
+          token: ${{ secrets.READ_AND_DELETE_PACKAGES_TOKEN }}
