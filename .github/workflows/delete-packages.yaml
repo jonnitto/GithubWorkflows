@@ -23,7 +23,7 @@ on:
         description: Account type is organisation, default to true
       keepAtLeast:
         required: false
-        default: 5
+        default: 6
         type: number
         description: Keep at least this many images
       cutOff:
