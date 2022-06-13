@@ -21,6 +21,16 @@ on:
         default: true
         type: boolean
         description: Account type is organisation, default to true
+      keepAtLeast:
+        required: false
+        default: 5
+        type: integer
+        description: Keep at least this many images
+      cutOff:
+        required: false
+        default: 'One week ago UTC'
+        type: string
+        description: Cut off images older than this
 
 jobs:
   deleteOldPackages:
@@ -42,10 +52,10 @@ jobs:
         uses: snok/container-retention-policy@v1
         with:
           image-names: ${{ steps.repository_name.outputs.lowercase }}${{ inputs.imageName }}
-          cut-off: One week ago UTC
+          cut-off: ${{ inputs.cutOff }}
           timestamp-to-use: updated_at
           account-type: personal
-          keep-at-least: 5
+          keep-at-least: ${{ inputs.keepAtLeast }}
           skip-tags: latest
           token: ${{ secrets.READ_AND_DELETE_PACKAGES_TOKEN }}
       - name: Delete containers older than one week
@@ -53,10 +63,10 @@ jobs:
         uses: snok/container-retention-policy@v1
         with:
           image-names: ${{ steps.repository_name.outputs.lowercase }}${{ inputs.imageName }}
-          cut-off: One week ago UTC
+          cut-off: ${{ inputs.cutOff }}
           timestamp-to-use: updated_at
           account-type: org
           org-name: ${{ steps.repository_owner.outputs.lowercase }}
-          keep-at-least: 5
+          keep-at-least: ${{ inputs.keepAtLeast }}
           skip-tags: latest
           token: ${{ secrets.READ_AND_DELETE_PACKAGES_TOKEN }}
