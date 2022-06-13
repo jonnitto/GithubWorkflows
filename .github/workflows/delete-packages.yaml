@@ -24,7 +24,7 @@ on:
       keepAtLeast:
         required: false
         default: 5
-        type: integer
+        type: number
         description: Keep at least this many images
       cutOff:
         required: false
