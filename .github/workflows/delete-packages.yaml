@@ -47,11 +47,18 @@ jobs:
         id: repository_owner
         with:
           string: ${{ github.repository_owner }}
+      - name: Plain repository name
+        uses: mad9000/actions-find-and-replace-string@2
+        id: plain_repository_name
+        with:
+          source: ${{ steps.repository_name.outputs.lowercase }}
+          find: ${{ steps.repository_owner.outputs.lowercase }}/
+          replace: ''
       - name: Delete containers
         if: ${{ inputs.accountIsOrganisation == false }}
         uses: snok/container-retention-policy@v1
         with:
-          image-names: ${{ steps.repository_name.outputs.lowercase }}${{ inputs.imageName }}
+          image-names: ${{ steps.plain_repository_name.outputs.value }}${{ inputs.imageName }}
           cut-off: ${{ inputs.cutOff }}
           timestamp-to-use: updated_at
           account-type: personal
@@ -62,7 +69,7 @@ jobs:
         if: ${{ inputs.accountIsOrganisation == true }}
         uses: snok/container-retention-policy@v1
         with:
-          image-names: ${{ steps.repository_name.outputs.lowercase }}${{ inputs.imageName }}
+          image-names: ${{ steps.plain_repository_name.outputs.value }}${{ inputs.imageName }}
           cut-off: ${{ inputs.cutOff }}
           timestamp-to-use: updated_at
           account-type: org
