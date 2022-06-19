@@ -41,7 +41,7 @@ jobs:
         uses: ASzc/change-string-case-action@v2
         id: repository_name
         with:
-          string: $GITHUB_REPOSITORY
+          string: ${{ github.repository }}
       - name: Lowercase repository owner
         uses: ASzc/change-string-case-action@v2
         id: repository_owner
