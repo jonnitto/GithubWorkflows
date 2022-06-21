@@ -32,7 +32,7 @@ on:
         type: string
 
 jobs:
-  build:
+  website:
     env:
       COMPOSER_AUTH: ${{secrets.COMPOSER_AUTH}}
     runs-on: ubuntu-latest

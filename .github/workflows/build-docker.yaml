@@ -1,4 +1,4 @@
-name: Deploy website with docker
+name: Build docker image
 
 on:
   workflow_call:
@@ -21,7 +21,7 @@ on:
         description: Dockerfile to use
 
 jobs:
-  deploy:
+  docker:
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
