@@ -1,4 +1,4 @@
-name: Delete old packages
+name: Cleanup workflow and docker images
 
 # on:
 #   schedule:
@@ -33,6 +33,16 @@ on:
         description: Cut off images older than this
 
 jobs:
+  deleteWorkflowRuns:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          retain_days: 30
+          keep_minimum_runs: 6
   deleteOldPackages:
     name: Delete old packages
     runs-on: ubuntu-latest
