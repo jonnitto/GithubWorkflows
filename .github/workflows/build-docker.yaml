@@ -44,13 +44,16 @@ jobs:
 
       - name: Download artifact
         uses: actions/download-artifact@v3
+        if: ${{ inputs.artifact != '' }}
         with:
           name: ${{ inputs.artifact }}
 
       - name: Unpack artifact
+        if: ${{ inputs.artifact != '' }}
         run: tar -xvf ${{ inputs.artifact }}.tar
 
       - name: Delete artifact
+        if: ${{ inputs.artifact != '' }}
         uses: geekyeggo/delete-artifact@v1
         with:
           name: ${{ inputs.artifact }}
