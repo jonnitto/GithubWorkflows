@@ -42,6 +42,10 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        if: ${{ inputs.artifact == '' }}
+
       - name: Download artifact
         uses: actions/download-artifact@v3
         if: ${{ inputs.artifact != '' }}
