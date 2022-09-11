@@ -18,6 +18,11 @@ on:
       REPLY_TO:
         required: false
     inputs:
+      sleep:
+        description: 'Wait x seconds before sending the notification'
+        required: false
+        type: number
+        default: 0
       message:
         required: false
         type: string
@@ -37,6 +42,11 @@ jobs:
   notification:
     runs-on: ubuntu-latest
     steps:
+      - name: Wait for sending email
+        if: ${{ inputs.sleep > 0 }}
+        shell: bash
+        run: sleep ${{ inputs.sleep }}s
+
       - name: Set salutation
         if: ${{ inputs.individual == true }}
         run: echo "SALUTATION=Hallo %name%," >> $GITHUB_ENV
