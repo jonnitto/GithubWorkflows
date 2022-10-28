@@ -38,12 +38,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Lowercase repository name
-        uses: ASzc/change-string-case-action@v3
+        uses: ASzc/change-string-case-action@v4
         id: repository_name
         with:
           string: ${{ github.repository }}
       - name: Lowercase repository owner
-        uses: ASzc/change-string-case-action@v3
+        uses: ASzc/change-string-case-action@v4
         id: repository_owner
         with:
           string: ${{ github.repository_owner }}
