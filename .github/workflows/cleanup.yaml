@@ -56,7 +56,7 @@ jobs:
           replace: ''
       - name: Delete containers
         if: ${{ inputs.accountIsOrganisation == false }}
-        uses: snok/container-retention-policy@v1
+        uses: snok/container-retention-policy@v2
         with:
           image-names: ${{ steps.plain_repository_name.outputs.value }}${{ inputs.imageName }}
           cut-off: ${{ inputs.cutOff }}
@@ -67,7 +67,7 @@ jobs:
           token: ${{ secrets.READ_AND_DELETE_PACKAGES_TOKEN }}
       - name: Delete containers
         if: ${{ inputs.accountIsOrganisation == true }}
-        uses: snok/container-retention-policy@v1
+        uses: snok/container-retention-policy@v2
         with:
           image-names: ${{ steps.plain_repository_name.outputs.value }}${{ inputs.imageName }}
           cut-off: ${{ inputs.cutOff }}
