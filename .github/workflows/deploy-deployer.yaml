@@ -51,7 +51,7 @@ jobs:
         run: tar -xvf build.tar
       - name: Delete artifact
         if: ${{ inputs.useArtifact == true }}
-        uses: geekyeggo/delete-artifact@v2
+        uses: geekyeggo/delete-artifact@v4
         with:
           name: build
       - name: Setup PHP
