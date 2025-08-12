@@ -40,7 +40,7 @@ jobs:
         run: echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_ENV
       - name: Checkout repository
         if: ${{ inputs.useArtifact == false }}
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Download artifact
         if: ${{ inputs.useArtifact == true }}
         uses: actions/download-artifact@v5
